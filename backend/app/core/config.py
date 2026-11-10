@@ -43,6 +43,11 @@ class Settings(BaseSettings):
 
     def init_storage(self):
         """Ensures storage directories exist."""
+        import os
+        if os.environ.get("VERCEL"):
+            self.UPLOAD_DIR = Path("/tmp/storage/uploads")
+            self.RESULTS_DIR = Path("/tmp/storage/results")
+            self.DATABASE_URL = "sqlite+aiosqlite:////tmp/fabricguard.db"
         self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
         self.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 

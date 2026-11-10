@@ -35,11 +35,15 @@ class DefectInferenceEngine:
     def _load_model(self):
         """Attempts to load trained YOLO model from disk."""
         candidate_paths = [
+            Path("../runs/segment/fabricguard_90plus_accuracy/weights/best.pt"),
+            Path("runs/segment/fabricguard_90plus_accuracy/weights/best.pt"),
             Path(settings.MODEL_WEIGHTS_PATH),
             Path("../ml/weights/best.pt"),
             Path("ml/weights/best.pt"),
             Path("../runs/segment/fabricguard_10_epochs/weights/best.pt"),
             Path("runs/segment/fabricguard_10_epochs/weights/best.pt"),
+            Path("../yolo11s-seg.pt"),
+            Path("yolo11s-seg.pt"),
             Path("../yolo11n-seg.pt"),
         ]
 

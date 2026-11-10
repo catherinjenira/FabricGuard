@@ -10,7 +10,7 @@ from pydantic import AnyHttpUrl, field_validator
 class Settings(BaseSettings):
     PROJECT_NAME: str = "FabricGuard-AI"
     API_V1_STR: str = "/api"
-    PORT: int = 8000
+    PORT: int = 8001
     HOST: str = "0.0.0.0"
     
     # CORS

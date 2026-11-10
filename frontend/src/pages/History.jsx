@@ -328,6 +328,17 @@ export function History() {
             </div>
 
             <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-800">
+              <a
+                href={selectedInspection.annotated_url || selectedInspection.image_url}
+                download={`stored_${selectedInspection.filename}`}
+                target="_blank"
+                rel="noreferrer"
+                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 transition-colors"
+                title="Download full stored swatch image"
+              >
+                <Download className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Download Image</span>
+              </a>
               <button
                 onClick={() => handleToggleFlag(selectedInspection)}
                 className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-amber-500/15 border border-slate-700 hover:border-amber-500/40 text-xs font-semibold text-slate-300 hover:text-amber-300 flex items-center gap-1.5 transition-colors"

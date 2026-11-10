@@ -32,10 +32,11 @@ class Settings(BaseSettings):
     MYSQL_DB: str = "fabricguard_db"
     DATABASE_URL: Optional[str] = None
 
-    # Storage
+    # Storage (Anchored to backend base directory)
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
-    UPLOAD_DIR: Path = Path("./storage/uploads")
-    RESULTS_DIR: Path = Path("./storage/results")
+    STORAGE_DIR: Path = Path(__file__).resolve().parent.parent.parent / "storage"
+    UPLOAD_DIR: Path = Path(__file__).resolve().parent.parent.parent / "storage" / "uploads"
+    RESULTS_DIR: Path = Path(__file__).resolve().parent.parent.parent / "storage" / "results"
 
     # ML & Detection
     MODEL_WEIGHTS_PATH: str = "../ml/weights/best.pt"
@@ -64,8 +65,10 @@ class Settings(BaseSettings):
     def init_storage(self):
         """Ensures storage directories exist."""
         if os.environ.get("VERCEL"):
+            self.STORAGE_DIR = Path("/tmp/storage")
             self.UPLOAD_DIR = Path("/tmp/storage/uploads")
             self.RESULTS_DIR = Path("/tmp/storage/results")
+        self.STORAGE_DIR.mkdir(parents=True, exist_ok=True)
         self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
         self.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 

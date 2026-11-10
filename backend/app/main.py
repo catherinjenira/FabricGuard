@@ -40,9 +40,8 @@ app.add_middleware(
 )
 
 # Mount static file storage for uploads and annotated results
-storage_dir = Path("./storage")
-storage_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/storage", StaticFiles(directory=str(storage_dir)), name="storage")
+settings.init_storage()
+app.mount("/storage", StaticFiles(directory=str(settings.STORAGE_DIR)), name="storage")
 
 # Include Routers
 app.include_router(inspection.router, prefix=settings.API_V1_STR)

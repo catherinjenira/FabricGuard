@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, AlertOctagon, AlertTriangle, Clock, Layers, ShieldCheck, ArrowRight, Flag } from 'lucide-react';
+import { CheckCircle2, AlertOctagon, AlertTriangle, Clock, Layers, ShieldCheck, ArrowRight, Flag, Download } from 'lucide-react';
 import ConfidenceBadge from './ConfidenceBadge';
 import { formatDefectName, getDefectColor, getSeverityBadge, formatPercent } from '../utils/formatters';
 import inspectionService from '../services/inspectionService';
@@ -93,6 +93,18 @@ export function DetectionResult({
           <span>{flagging ? 'Sending to Queue...' : 'Send to QA Review Queue'}</span>
         </button>
       )}
+
+      {/* Download Stored Picture Button */}
+      <a
+        href={result.annotated_url || result.image_url}
+        download={`stored_${result.filename}`}
+        target="_blank"
+        rel="noreferrer"
+        className="w-full py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+      >
+        <Download className="w-3.5 h-3.5 text-emerald-400" />
+        <span>Save / Download Stored Image</span>
+      </a>
 
       {/* Defect List */}
       <div className="space-y-3">

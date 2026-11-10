@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ClipboardCheck, AlertTriangle, CheckCircle2, RefreshCw, UserCheck, Inbox, Sparkles, X, Eye } from 'lucide-react';
+import { ClipboardCheck, AlertTriangle, CheckCircle2, RefreshCw, UserCheck, Inbox, Sparkles, X, Eye, Download } from 'lucide-react';
 import BoundingBoxViewer from '../components/BoundingBoxViewer';
 import ReviewPanel from '../components/ReviewPanel';
 import ConfidenceBadge from '../components/ConfidenceBadge';
@@ -225,27 +225,41 @@ export function ReviewQueue() {
                     <span className="text-slate-400 font-semibold">
                       Inspect Swatch: <span className="text-slate-200 font-mono">{selectedInspection.filename}</span>
                     </span>
-                    <div className="flex items-center gap-1.5 bg-slate-900 rounded-lg p-0.5 border border-slate-800 text-[11px]">
-                      <button
-                        onClick={() => setViewMode('annotated')}
-                        className={`px-2 py-0.5 rounded font-medium transition-colors ${
-                          viewMode === 'annotated'
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'text-slate-400 hover:text-slate-200'
-                        }`}
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 bg-slate-900 rounded-lg p-0.5 border border-slate-800 text-[11px]">
+                        <button
+                          onClick={() => setViewMode('annotated')}
+                          className={`px-2 py-0.5 rounded font-medium transition-colors ${
+                            viewMode === 'annotated'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              : 'text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          AI Masks
+                        </button>
+                        <button
+                          onClick={() => setViewMode('raw')}
+                          className={`px-2 py-0.5 rounded font-medium transition-colors ${
+                            viewMode === 'raw'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              : 'text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          Raw Swatch
+                        </button>
+                      </div>
+
+                      <a
+                        href={viewMode === 'raw' ? selectedInspection.image_url : (selectedInspection.annotated_url || selectedInspection.image_url)}
+                        download={`stored_${selectedInspection.filename}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                        title="Download and save picture"
                       >
-                        AI Masks
-                      </button>
-                      <button
-                        onClick={() => setViewMode('raw')}
-                        className={`px-2 py-0.5 rounded font-medium transition-colors ${
-                          viewMode === 'raw'
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        Raw Swatch
-                      </button>
+                        <Download className="w-3 h-3 text-emerald-400" />
+                        <span>Save Picture</span>
+                      </a>
                     </div>
                   </div>
 

@@ -48,6 +48,7 @@ ml/dataset/processed/labels/test/*
 runs/
 wandb/
 *.zip
+Febric Defect Detection and Segm.yolov/
 
 # Node & Frontend
 node_modules/

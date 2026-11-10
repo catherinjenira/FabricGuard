@@ -1,11 +1,13 @@
 """
 FabricGuard-AI Configuration Settings.
+Supports MySQL database connection with connection pooling and cloud deployment support.
 """
 
-from typing import List, Union
+import os
+from typing import List, Optional
 from pathlib import Path
+from urllib.parse import quote_plus
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import AnyHttpUrl, field_validator
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "FabricGuard-AI"
@@ -18,11 +20,17 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "*"
     ]
 
-    # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./fabricguard.db"
+    # MySQL Database Configuration
+    MYSQL_USER: str = "root"
+    MYSQL_PASSWORD: str = "Catherin@07"
+    MYSQL_HOST: str = "127.0.0.1"
+    MYSQL_PORT: int = 3306
+    MYSQL_DB: str = "fabricguard_db"
+    DATABASE_URL: Optional[str] = None
 
     # Storage
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
@@ -41,16 +49,25 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
+    def get_database_url(self) -> str:
+        """Constructs safe MySQL async database URL or uses explicit DATABASE_URL."""
+        if self.DATABASE_URL:
+            # If standard mysql:// is provided, convert to async driver mysql+aiomysql://
+            if self.DATABASE_URL.startswith("mysql://"):
+                return self.DATABASE_URL.replace("mysql://", "mysql+aiomysql://", 1)
+            return self.DATABASE_URL
+
+        # Escape special characters in password
+        encoded_pwd = quote_plus(self.MYSQL_PASSWORD)
+        return f"mysql+aiomysql://{self.MYSQL_USER}:{encoded_pwd}@{self.MYSQL_HOST}:{self.MYSQL_PORT}/{self.MYSQL_DB}"
+
     def init_storage(self):
         """Ensures storage directories exist."""
-        import os
         if os.environ.get("VERCEL"):
             self.UPLOAD_DIR = Path("/tmp/storage/uploads")
             self.RESULTS_DIR = Path("/tmp/storage/results")
-            self.DATABASE_URL = "sqlite+aiosqlite:////tmp/fabricguard.db"
         self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
         self.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 settings = Settings()
 settings.init_storage()
-

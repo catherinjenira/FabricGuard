@@ -57,9 +57,24 @@ export const inspectionService = {
     return apiClient.get('/review/queue');
   },
 
+  // Flag an inspection for HITL review
+  async flagForReview(id, reason = 'Flagged by Inspector') {
+    return apiClient.post(`/review/${id}/flag`, { reason });
+  },
+
+  // Unflag an inspection
+  async unflagFromReview(id) {
+    return apiClient.post(`/review/${id}/unflag`);
+  },
+
   // Submit Review Decision
   async submitReviewDecision(id, decisionData) {
     return apiClient.post(`/review/${id}/decision`, decisionData);
+  },
+
+  // Seed demo swatches into review queue
+  async seedDemoReview() {
+    return apiClient.post('/review/seed-demo');
   },
 
   // Analytics & Evaluation

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, Edit3, MessageSquare, User, Save, AlertTriangle } from 'lucide-react';
 import { formatDefectName, getDefectColor } from '../utils/formatters';
 
@@ -24,6 +24,14 @@ export function ReviewPanel({
   const [reviewerName, setReviewerName] = useState('Elena Vance (QA Lead)');
   const [notes, setNotes] = useState('');
   const [editableDefects, setEditableDefects] = useState(inspection?.defects || []);
+
+  useEffect(() => {
+    if (inspection) {
+      setEditableDefects(inspection.defects || []);
+      setAction('APPROVED');
+      setNotes('');
+    }
+  }, [inspection?.id]);
 
   if (!inspection) {
     return (
@@ -51,11 +59,20 @@ export function ReviewPanel({
   };
 
   const handleSubmit = () => {
+    let corrected = null;
+    if (action === 'MODIFIED') {
+      corrected = editableDefects;
+    } else if (action === 'REJECTED') {
+      corrected = [];
+    } else {
+      corrected = inspection.defects;
+    }
+
     onSubmitDecision(inspection.id, {
       reviewer_name: reviewerName,
       action: action,
       notes: notes,
-      corrected_defects: action === 'MODIFIED' ? editableDefects : inspection.defects
+      corrected_defects: corrected
     });
   };
 

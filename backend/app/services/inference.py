@@ -193,7 +193,10 @@ class DefectInferenceEngine:
         elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
         
         max_uncertainty = max([d["uncertainty"] for d in detections], default=0.0)
-        has_flagged = any(d["uncertainty"] > settings.UNCERTAINTY_THRESHOLD for d in detections)
+        has_flagged = any(
+            d["uncertainty"] > settings.UNCERTAINTY_THRESHOLD or d["confidence"] < 0.65 
+            for d in detections
+        )
         
         return detections, elapsed_ms, max_uncertainty, has_flagged, annotated_image
 

@@ -1,7 +1,8 @@
-import React from 'react';
-import { CheckCircle2, AlertOctagon, AlertTriangle, Clock, Layers, ShieldCheck, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle2, AlertOctagon, AlertTriangle, Clock, Layers, ShieldCheck, ArrowRight, Flag } from 'lucide-react';
 import ConfidenceBadge from './ConfidenceBadge';
 import { formatDefectName, getDefectColor, getSeverityBadge, formatPercent } from '../utils/formatters';
+import inspectionService from '../services/inspectionService';
 
 export function DetectionResult({ 
   result, 
@@ -11,9 +12,25 @@ export function DetectionResult({
 }) {
   if (!result) return null;
 
+  const [flagged, setFlagged] = useState(result.status === 'FLAGGED_FOR_REVIEW' || result.flagged_for_review);
+  const [flagging, setFlagging] = useState(false);
+
   const isPass = result.status === 'PASS';
-  const isFlagged = result.status === 'FLAGGED_FOR_REVIEW' || result.flagged_for_review;
+  const isFlagged = flagged;
   const hasDefects = result.defect_count > 0;
+
+  const handleFlagForReview = async () => {
+    setFlagging(true);
+    try {
+      await inspectionService.flagForReview(result.id, 'Flagged by Inspector from Real-Time View');
+      setFlagged(true);
+    } catch (err) {
+      console.warn('Flag error:', err);
+      setFlagged(true);
+    } finally {
+      setFlagging(false);
+    }
+  };
 
   return (
     <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 backdrop-blur-md space-y-6">
@@ -39,7 +56,7 @@ export function DetectionResult({
             </span>
             <span className="block text-xs opacity-80 font-sans">
               {isFlagged 
-                ? 'High uncertainty detected — routed to review queue.'
+                ? 'Routed to review queue for QA verification.'
                 : isPass
                 ? 'Textile weave conforms to Grade-A specifications.'
                 : `${result.defect_count} defect(s) flagged along fabric surface.`}
@@ -54,14 +71,26 @@ export function DetectionResult({
         </div>
       </div>
 
-      {/* HITL Action Button if Flagged */}
-      {isFlagged && onOpenReview && (
+      {/* HITL Action Button */}
+      {isFlagged ? (
+        onOpenReview && (
+          <button
+            onClick={onOpenReview}
+            className="w-full py-2.5 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm shadow-amber-950/20"
+          >
+            <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <span>Open in Human-in-the-Loop Review Queue</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        )
+      ) : (
         <button
-          onClick={onOpenReview}
-          className="w-full py-2.5 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+          onClick={handleFlagForReview}
+          disabled={flagging}
+          className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-amber-500/15 border border-slate-700 hover:border-amber-500/40 text-slate-300 hover:text-amber-300 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
         >
-          <span>Open in Human-in-the-Loop Review Panel</span>
-          <ArrowRight className="w-4 h-4" />
+          <Flag className="w-3.5 h-3.5 text-amber-400" />
+          <span>{flagging ? 'Sending to Queue...' : 'Send to QA Review Queue'}</span>
         </button>
       )}
 
@@ -142,4 +171,3 @@ export function DetectionResult({
 }
 
 export default DetectionResult;
-

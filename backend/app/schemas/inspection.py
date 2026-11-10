@@ -69,3 +69,6 @@ class ReviewDecisionRequest(BaseModel):
     notes: Optional[str] = None
     corrected_defects: Optional[List[DefectDetection]] = None
 
+class FlagInspectionRequest(BaseModel):
+    reason: Optional[str] = "Manual QA Review Flag"
+

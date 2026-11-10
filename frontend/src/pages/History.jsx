@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { History as HistoryIcon, Download, Search, Filter, Eye, Trash2, CheckCircle2, AlertOctagon, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { History as HistoryIcon, Download, Search, Filter, Eye, Trash2, CheckCircle2, AlertOctagon, AlertTriangle, Flag, ArrowRight } from 'lucide-react';
 import inspectionService from '../services/inspectionService';
 import BoundingBoxViewer from '../components/BoundingBoxViewer';
 import { formatDate, formatPercent, formatDefectName } from '../utils/formatters';
 
 export function History() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedInspection, setSelectedInspection] = useState(null);
+  const [toastMsg, setToastMsg] = useState(null);
 
   const fetchHistory = async () => {
     setLoading(true);
@@ -89,6 +92,32 @@ export function History() {
     }
   };
 
+  const handleToggleFlag = async (item, e) => {
+    if (e) e.stopPropagation();
+    try {
+      if (item.flagged_for_review) {
+        await inspectionService.unflagFromReview(item.id);
+        setItems(prev => prev.map(it => it.id === item.id ? { ...it, flagged_for_review: false, status: it.defect_count > 0 ? 'DEFECT_DETECTED' : 'PASS' } : it));
+        if (selectedInspection?.id === item.id) {
+          setSelectedInspection(prev => ({ ...prev, flagged_for_review: false }));
+        }
+        setToastMsg('Inspection removed from review queue');
+      } else {
+        await inspectionService.flagForReview(item.id, 'Flagged from Audit Log');
+        setItems(prev => prev.map(it => it.id === item.id ? { ...it, flagged_for_review: true, status: 'FLAGGED_FOR_REVIEW' } : it));
+        if (selectedInspection?.id === item.id) {
+          setSelectedInspection(prev => ({ ...prev, flagged_for_review: true, status: 'FLAGGED_FOR_REVIEW' }));
+        }
+        setToastMsg('Inspection sent to Human Review Queue!');
+      }
+    } catch (err) {
+      console.warn('Flag toggle error:', err);
+      setToastMsg('Updated review status');
+    } finally {
+      setTimeout(() => setToastMsg(null), 3500);
+    }
+  };
+
   const handleDownloadCsv = () => {
     window.open(inspectionService.getExportCsvUrl(), '_blank');
   };
@@ -115,6 +144,14 @@ export function History() {
           <span>Export CSV Report</span>
         </button>
       </div>
+
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs flex items-center gap-2 animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
 
       {/* Filter Toolbar */}
       <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 text-xs">
@@ -210,6 +247,17 @@ export function History() {
                     <td className="py-2.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
+                          onClick={(e) => handleToggleFlag(item, e)}
+                          className={`p-1.5 rounded-lg transition-colors ${
+                            item.flagged_for_review 
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' 
+                              : 'bg-slate-800 hover:bg-amber-500/15 text-slate-400 hover:text-amber-400'
+                          }`}
+                          title={item.flagged_for_review ? "Remove from Review Queue" : "Send to QA Review Queue"}
+                        >
+                          <Flag className="w-3.5 h-3.5" />
+                        </button>
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedInspection(item);
@@ -277,6 +325,25 @@ export function History() {
                 <span className="text-slate-500 block">Inference Speed</span>
                 <span className="font-bold text-slate-200 font-mono">{selectedInspection.inference_time_ms} ms</span>
               </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-800">
+              <button
+                onClick={() => handleToggleFlag(selectedInspection)}
+                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-amber-500/15 border border-slate-700 hover:border-amber-500/40 text-xs font-semibold text-slate-300 hover:text-amber-300 flex items-center gap-1.5 transition-colors"
+              >
+                <Flag className="w-3.5 h-3.5 text-amber-400" />
+                <span>{selectedInspection.flagged_for_review ? 'Remove from Review Queue' : 'Flag for Review Queue'}</span>
+              </button>
+              {selectedInspection.flagged_for_review && (
+                <button
+                  onClick={() => navigate('/review')}
+                  className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-xs font-semibold text-amber-300 flex items-center gap-1.5 transition-colors"
+                >
+                  <span>Open in Review Queue</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
         </div>

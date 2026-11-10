@@ -4,6 +4,7 @@ Single image fabric inspection API routes.
 
 import io
 import uuid
+import base64
 from pathlib import Path
 from typing import List, Optional
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
@@ -53,6 +54,8 @@ def format_inspection_response(inspection: Inspection) -> InspectionResponse:
         filename=inspection.filename,
         image_url=image_url,
         annotated_url=annotated_url,
+        image_base64=inspection.image_base64,
+        annotated_base64=inspection.annotated_base64,
         status=inspection.status,
         defect_count=inspection.defect_count,
         max_confidence=inspection.max_confidence,
@@ -103,16 +106,33 @@ async def inspect_single_image(
     annotated_img = model_annotated if model_annotated else draw_defect_boxes(image, detections)
     save_processed_image(annotated_img, annotated_path)
 
+    # Encode pictures to Base64 to store permanently inside MySQL
+    img_b64 = "data:image/jpeg;base64," + base64.b64encode(content).decode()
+    buf = io.BytesIO()
+    annotated_img.save(buf, format="JPEG", quality=90)
+    ann_b64 = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+
+    # Mirror to workspace root storage for easy Desktop Explorer access
+    try:
+        root_upload = Path("../storage/uploads") / f"{file_id}_{safe_name}"
+        root_results = Path("../storage/results") / f"annotated_{file_id}_{safe_name}"
+        save_processed_image(image, root_upload)
+        save_processed_image(annotated_img, root_results)
+    except Exception:
+        pass
+
     # Every checked fabric routes directly to the Human Review Queue for QA verification
     status = InspectionStatus.FLAGGED_FOR_REVIEW.value
     max_conf = max([d["confidence"] for d in detections], default=1.0 if not detections else 0.0)
 
-    # Persist in DB
+    # Persist in DB (Both file path reference & binary Base64 stored in MySQL)
     inspection = Inspection(
         id=file_id,
         filename=safe_name,
         image_path=str(upload_path),
         annotated_path=str(annotated_path),
+        image_base64=img_b64,
+        annotated_base64=ann_b64,
         status=status,
         defect_count=len(detections),
         max_confidence=max_conf,

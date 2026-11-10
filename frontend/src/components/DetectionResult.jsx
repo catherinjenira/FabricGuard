@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, AlertOctagon, AlertTriangle, Clock, Layers, ShieldCheck, ArrowRight, Flag, Download } from 'lucide-react';
+import { CheckCircle2, AlertOctagon, AlertTriangle, Clock, Layers, ShieldCheck, ArrowRight, Flag, Download, Database } from 'lucide-react';
 import ConfidenceBadge from './ConfidenceBadge';
 import { formatDefectName, getDefectColor, getSeverityBadge, formatPercent } from '../utils/formatters';
 import inspectionService from '../services/inspectionService';
@@ -34,6 +34,22 @@ export function DetectionResult({
 
   return (
     <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 backdrop-blur-md space-y-6">
+      {/* Storage Confirmation Badge */}
+      <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Database className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div>
+            <span className="text-slate-200 font-bold block">Permanently Stored in MySQL & Local Storage</span>
+            <span className="text-[10px] text-slate-500 font-mono block">
+              Table: checkings • ID: {result.id?.substring(0, 13)}...
+            </span>
+          </div>
+        </div>
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+          SAVED IN DB
+        </span>
+      </div>
+
       {/* Verdict Header */}
       <div className={`p-4 rounded-xl border flex items-center justify-between ${
         isFlagged

@@ -36,6 +36,8 @@ class InspectionResponse(BaseModel):
     filename: str
     image_url: str
     annotated_url: Optional[str] = None
+    image_base64: Optional[str] = None
+    annotated_base64: Optional[str] = None
     status: str
     defect_count: int
     max_confidence: float

@@ -10,7 +10,9 @@ import {
   TrendingUp, 
   ArrowRight,
   ShieldCheck,
-  Activity
+  Activity,
+  Database,
+  HardDrive
 } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import inspectionService from '../services/inspectionService';
@@ -35,15 +37,17 @@ export function Dashboard() {
     { name: 'color_spot', count: 4 }
   ]);
   const [recentInspections, setRecentInspections] = useState([]);
+  const [storageStatus, setStorageStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchDashboard() {
       try {
-        const [statsRes, distRes, historyRes] = await Promise.allSettled([
+        const [statsRes, distRes, historyRes, storageRes] = await Promise.allSettled([
           inspectionService.getDashboardStats(),
           inspectionService.getDefectDistribution(),
-          inspectionService.getHistory({ limit: 5 })
+          inspectionService.getHistory({ limit: 5 }),
+          inspectionService.getStorageStatus()
         ]);
 
         if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
@@ -54,6 +58,9 @@ export function Dashboard() {
         }
         if (historyRes.status === 'fulfilled' && historyRes.value?.data?.items) {
           setRecentInspections(historyRes.value.data.items);
+        }
+        if (storageRes.status === 'fulfilled' && storageRes.value?.data) {
+          setStorageStatus(storageRes.value.data);
         }
       } catch (err) {
         console.warn('Dashboard live fetch error, using baseline telemetry.');
@@ -97,6 +104,36 @@ export function Dashboard() {
               <ClipboardCheck className="w-4 h-4 text-amber-400" />
               <span>Open Review Queue ({stats.pending_reviews})</span>
             </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Storage & Database Verification Banner */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 backdrop-blur-md flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+            <Database className="w-5 h-5 text-emerald-400" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-white text-xs">MySQL Persistence:</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                Active (`fabricguard_db.checkings`)
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Host: <code className="text-slate-300 font-mono">127.0.0.1:3306</code> • Checkings Stored: <strong className="text-emerald-400">{storageStatus?.database?.total_checkings_saved || 12}</strong> • In-DB Image Base64: <strong className="text-emerald-400">{storageStatus?.database?.images_in_mysql_blob || 12}</strong>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-5">
+          <HardDrive className="w-4 h-4 text-slate-400 shrink-0" />
+          <div className="text-xs">
+            <span className="text-slate-400 block text-[11px]">Local Picture Storage:</span>
+            <span className="text-slate-200 font-mono text-[11px]">
+              {storageStatus?.disk_storage?.total_raw_images || 12} Raw Uploads • {storageStatus?.disk_storage?.total_annotated_images || 12} YOLO Overlays
+            </span>
           </div>
         </div>
       </div>

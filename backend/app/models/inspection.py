@@ -36,6 +36,8 @@ class Inspection(Base):
     filename = Column(String(255), nullable=False)
     image_path = Column(String(500), nullable=False)
     annotated_path = Column(String(500), nullable=True)
+    image_base64 = Column(Text(length=4294967295), nullable=True) # Full image data stored directly in MySQL
+    annotated_base64 = Column(Text(length=4294967295), nullable=True)
     status = Column(String(50), default=InspectionStatus.PASS.value)
     defect_count = Column(Integer, default=0)
     max_confidence = Column(Float, default=0.0)

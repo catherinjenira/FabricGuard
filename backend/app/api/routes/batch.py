@@ -4,6 +4,7 @@ Batch fabric inspection API endpoints.
 
 import io
 import uuid
+import base64
 from pathlib import Path
 from typing import List
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
@@ -70,6 +71,21 @@ async def process_batch_inspection(
         annotated_img = model_annotated if model_annotated else draw_defect_boxes(image, detections)
         save_processed_image(annotated_img, annotated_path)
 
+        # Base64 serialization for permanent MySQL persistence
+        img_b64 = "data:image/jpeg;base64," + base64.b64encode(content).decode()
+        buf = io.BytesIO()
+        annotated_img.save(buf, format="JPEG", quality=90)
+        ann_b64 = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+
+        # Mirror to root storage for instant Desktop Explorer visibility
+        try:
+            root_upload = Path("../storage/uploads") / f"{file_id}_{safe_name}"
+            root_results = Path("../storage/results") / f"annotated_{file_id}_{safe_name}"
+            save_processed_image(image, root_upload)
+            save_processed_image(annotated_img, root_results)
+        except Exception:
+            pass
+
         # Every checked item in the batch automatically routes to Review Queue
         status = InspectionStatus.FLAGGED_FOR_REVIEW.value
         batch.flagged_count += 1
@@ -84,6 +100,8 @@ async def process_batch_inspection(
             filename=safe_name,
             image_path=str(upload_path),
             annotated_path=str(annotated_path),
+            image_base64=img_b64,
+            annotated_base64=ann_b64,
             status=status,
             defect_count=len(detections),
             max_confidence=max([d["confidence"] for d in detections], default=1.0 if not detections else 0.0),

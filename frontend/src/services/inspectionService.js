@@ -82,6 +82,10 @@ export const inspectionService = {
     return apiClient.get('/evaluation/stats');
   },
 
+  async getStorageStatus() {
+    return apiClient.get('/evaluation/storage-status');
+  },
+
   async getModelMetrics() {
     return apiClient.get('/evaluation/metrics');
   },

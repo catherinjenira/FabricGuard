@@ -63,11 +63,11 @@ async def process_batch_inspection(
         save_processed_image(image, upload_path)
 
         processed_img = apply_clahe(image) if enhance_clahe else image
-        detections, latency_ms, max_u, is_flagged = inference_engine.predict(
+        detections, latency_ms, max_u, is_flagged, model_annotated = inference_engine.predict(
             processed_img, conf_threshold=confidence_threshold
         )
 
-        annotated_img = draw_defect_boxes(image, detections)
+        annotated_img = model_annotated if model_annotated else draw_defect_boxes(image, detections)
         save_processed_image(annotated_img, annotated_path)
 
         if is_flagged:

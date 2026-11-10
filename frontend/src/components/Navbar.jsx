@@ -18,7 +18,7 @@ export function Navbar({ title = 'Fabric Defect Quality Station' }) {
         {/* Model status */}
         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700 text-xs text-slate-300">
           <Cpu className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Model: <span className="font-mono text-slate-100">YOLOv8s-Fabric-1.4</span></span>
+          <span>Model: <span className="font-mono text-slate-100">YOLO11n-seg (10 Epochs)</span></span>
         </div>
 
         {/* HITL Triage status */}

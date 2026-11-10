@@ -20,7 +20,7 @@ export function ImageUploader({
   const [previewUrl, setPreviewUrl] = useState(null);
   const [fabricType, setFabricType] = useState(defaultFabric);
   const [enhanceClahe, setEnhanceClahe] = useState(true);
-  const [confidenceThreshold, setConfidenceThreshold] = useState(0.50);
+  const [confidenceThreshold, setConfidenceThreshold] = useState(0.25);
   const [validationError, setValidationError] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -160,7 +160,7 @@ export function ImageUploader({
           </div>
           <input
             type="range"
-            min="0.25"
+            min="0.10"
             max="0.90"
             step="0.05"
             value={confidenceThreshold}

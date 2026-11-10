@@ -115,7 +115,7 @@ class EvaluationService:
             pending_reviews=pending_reviews,
             overall_pass_rate=pass_rate,
             avg_inference_latency_ms=round(avg_latency, 2),
-            active_model_version="FabricGuard-YOLOv8s-v1.4"
+            active_model_version="FabricGuard-YOLO11n-seg (10 Epochs)"
         )
 
     @staticmethod
@@ -129,11 +129,10 @@ class EvaluationService:
         data = res.all()
         if not data:
             return [
-                {"name": "hole", "count": 14},
-                {"name": "stain", "count": 28},
-                {"name": "weaving_slub", "count": 19},
-                {"name": "yarn_defect", "count": 9},
-                {"name": "crease", "count": 6}
+                {"name": "hole Defect", "count": 22},
+                {"name": "stain Defect", "count": 34},
+                {"name": "Needle Mark Defect", "count": 16},
+                {"name": "missing yarn Defect", "count": 11}
             ]
         return [{"name": row[0], "count": row[1]} for row in data]
 

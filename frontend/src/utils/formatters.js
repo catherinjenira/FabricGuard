@@ -40,6 +40,13 @@ export function formatDefectName(name) {
 }
 
 export const DEFECT_COLORS = {
+  // 10-Epoch Roboflow YOLO11n-seg Classes
+  needle_mark_defect: '#a855f7', // Purple
+  hole_defect: '#ef4444',        // Red
+  missing_yarn_defect: '#3b82f6',// Blue
+  stain_defect: '#f59e0b',       // Amber
+
+  // General fabric defect taxonomies
   hole: '#ef4444',        // Red
   stain: '#f59e0b',       // Amber
   weaving_slub: '#a855f7',// Purple

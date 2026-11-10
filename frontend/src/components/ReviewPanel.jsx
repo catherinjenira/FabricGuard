@@ -3,8 +3,16 @@ import { CheckCircle2, XCircle, Edit3, MessageSquare, User, Save, AlertTriangle 
 import { formatDefectName, getDefectColor } from '../utils/formatters';
 
 const DEFECT_CLASSES = [
-  'hole', 'stain', 'weaving_slub', 'yarn_defect',
-  'crease', 'color_spot', 'knot', 'foreign_fiber'
+  'Needle Mark Defect',
+  'hole Defect',
+  'missing yarn Defect',
+  'stain Defect',
+  'hole',
+  'stain',
+  'weaving_slub',
+  'yarn_defect',
+  'crease',
+  'color_spot'
 ];
 
 export function ReviewPanel({ 

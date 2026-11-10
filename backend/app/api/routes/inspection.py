@@ -94,13 +94,13 @@ async def inspect_single_image(
     # Preprocessing
     processed_img = apply_clahe(image) if enhance_clahe else image
 
-    # Run AI inference
-    detections, latency_ms, max_u, is_flagged = inference_engine.predict(
+    # Run AI inference with 10-epoch YOLO model
+    detections, latency_ms, max_u, is_flagged, model_annotated = inference_engine.predict(
         processed_img, conf_threshold=confidence_threshold
     )
 
-    # Render bounding boxes onto annotated copy
-    annotated_img = draw_defect_boxes(image, detections)
+    # Render segmentation masks / bounding boxes onto annotated copy
+    annotated_img = model_annotated if model_annotated else draw_defect_boxes(image, detections)
     save_processed_image(annotated_img, annotated_path)
 
     # Determine status

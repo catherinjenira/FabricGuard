@@ -31,7 +31,7 @@ class Settings(BaseSettings):
 
     # ML & Detection
     MODEL_WEIGHTS_PATH: str = "../ml/weights/best.pt"
-    CONFIDENCE_THRESHOLD: float = 0.50
+    CONFIDENCE_THRESHOLD: float = 0.25
     UNCERTAINTY_THRESHOLD: float = 0.35
     MAX_IMAGE_SIZE_MB: int = 15
 

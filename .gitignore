@@ -47,6 +47,7 @@ ml/dataset/processed/labels/test/*
 !ml/dataset/processed/labels/test/.gitkeep
 runs/
 wandb/
+*.zip
 
 # Node & Frontend
 node_modules/

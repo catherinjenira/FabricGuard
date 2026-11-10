@@ -103,14 +103,8 @@ async def inspect_single_image(
     annotated_img = model_annotated if model_annotated else draw_defect_boxes(image, detections)
     save_processed_image(annotated_img, annotated_path)
 
-    # Determine status
-    if is_flagged:
-        status = InspectionStatus.FLAGGED_FOR_REVIEW.value
-    elif len(detections) > 0:
-        status = InspectionStatus.DEFECT_DETECTED.value
-    else:
-        status = InspectionStatus.PASS.value
-
+    # Every checked fabric routes directly to the Human Review Queue for QA verification
+    status = InspectionStatus.FLAGGED_FOR_REVIEW.value
     max_conf = max([d["confidence"] for d in detections], default=1.0 if not detections else 0.0)
 
     # Persist in DB
@@ -123,7 +117,7 @@ async def inspect_single_image(
         defect_count=len(detections),
         max_confidence=max_conf,
         uncertainty_score=max_u,
-        flagged_for_review=is_flagged,
+        flagged_for_review=True,
         inference_time_ms=latency_ms,
         fabric_type=fabric_type
     )

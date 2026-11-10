@@ -70,14 +70,12 @@ async def process_batch_inspection(
         annotated_img = model_annotated if model_annotated else draw_defect_boxes(image, detections)
         save_processed_image(annotated_img, annotated_path)
 
-        if is_flagged:
-            status = InspectionStatus.FLAGGED_FOR_REVIEW.value
-            batch.flagged_count += 1
-        elif len(detections) > 0:
-            status = InspectionStatus.DEFECT_DETECTED.value
+        # Every checked item in the batch automatically routes to Review Queue
+        status = InspectionStatus.FLAGGED_FOR_REVIEW.value
+        batch.flagged_count += 1
+        if len(detections) > 0:
             batch.defect_count += 1
         else:
-            status = InspectionStatus.PASS.value
             batch.passed_count += 1
 
         inspection = Inspection(
@@ -90,7 +88,7 @@ async def process_batch_inspection(
             defect_count=len(detections),
             max_confidence=max([d["confidence"] for d in detections], default=1.0 if not detections else 0.0),
             uncertainty_score=max_u,
-            flagged_for_review=is_flagged,
+            flagged_for_review=True,
             inference_time_ms=latency_ms,
             fabric_type=fabric_type
         )

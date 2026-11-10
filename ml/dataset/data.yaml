@@ -1,0 +1,21 @@
+# FabricGuard-AI YOLO Dataset Configuration
+
+path: ./dataset/processed
+train: images/train
+val: images/val
+test: images/test
+
+# Number of classes
+nc: 8
+
+# Class names
+names:
+  0: hole
+  1: stain
+  2: weaving_slub
+  3: yarn_defect
+  4: crease
+  5: color_spot
+  6: knot
+  7: foreign_fiber
+

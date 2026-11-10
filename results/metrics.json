@@ -1,0 +1,63 @@
+{
+  "model_version": "YOLOv8s-FabricGuard-v1.4",
+  "eval_split": "test",
+  "total_test_samples": 1200,
+  "overall": {
+    "mAP50": 0.934,
+    "mAP50_95": 0.782,
+    "precision": 0.942,
+    "recall": 0.918,
+    "f1_score": 0.93,
+    "mean_inference_time_ms": 8.1
+  },
+  "per_class": {
+    "hole": {
+      "precision": 0.978,
+      "recall": 0.965,
+      "mAP50": 0.982,
+      "samples": 210
+    },
+    "stain": {
+      "precision": 0.952,
+      "recall": 0.931,
+      "mAP50": 0.945,
+      "samples": 245
+    },
+    "weaving_slub": {
+      "precision": 0.915,
+      "recall": 0.884,
+      "mAP50": 0.898,
+      "samples": 180
+    },
+    "yarn_defect": {
+      "precision": 0.902,
+      "recall": 0.879,
+      "mAP50": 0.886,
+      "samples": 150
+    },
+    "crease": {
+      "precision": 0.941,
+      "recall": 0.925,
+      "mAP50": 0.938,
+      "samples": 130
+    },
+    "color_spot": {
+      "precision": 0.96,
+      "recall": 0.938,
+      "mAP50": 0.951,
+      "samples": 115
+    },
+    "knot": {
+      "precision": 0.934,
+      "recall": 0.901,
+      "mAP50": 0.919,
+      "samples": 95
+    },
+    "foreign_fiber": {
+      "precision": 0.954,
+      "recall": 0.92,
+      "mAP50": 0.953,
+      "samples": 75
+    }
+  }
+}

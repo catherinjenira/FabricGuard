@@ -142,7 +142,15 @@ class DefectInferenceEngine:
 
         if self.is_loaded and self.model:
             try:
-                results = self.model.predict(source=image, conf=conf_threshold, verbose=False)
+                # High-precision inference settings: retina_masks=True for sharp polygon boundaries
+                results = self.model.predict(
+                    source=image,
+                    conf=conf_threshold,
+                    iou=0.45,
+                    max_det=300,
+                    retina_masks=True,
+                    verbose=False
+                )
                 res = results[0]
                 
                 # Render segmentation masks + bounding boxes from the model
